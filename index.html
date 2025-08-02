@@ -1,0 +1,218 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitaflow Medical</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; margin: 0; padding: 0; line-height: 1.6; }
+        header { background: #005555; color: white; padding: 20px; text-align: center; }
+        nav { background: #f4f4f4; padding: 10px; }
+        nav a { margin: 0 15px; text-decoration: none; color: #005555; }
+        section { padding: 20px; max-width: 1200px; margin: auto; }
+        h1 { color: #005555; }
+        .product-slider, .image-gallery, .product-gallery { display: flex; gap: 10px; overflow-x: auto; }
+        img, video { max-width: 300px; height: auto; }
+        button { background: #005555; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        button:hover { background: #003737; }
+        .map iframe { width: 100%; max-width: 600px; height: 450px; }
+        form { display: flex; flex-direction: column; gap: 10px; max-width: 500px; }
+        input, textarea { padding: 10px; border: 1px solid #ccc; }
+        .social-share a { margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Vitaflow Medical</h1>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#about-us">About Us</a>
+            <a href="#products-services">Products</a>
+            <a href="#blog">Blog</a>
+            <a href="#contact-us">Contact</a>
+        </nav>
+    </header>
+
+    <!-- Home Page -->
+    <section id="home">
+        <h1>Simplifying Critical Care, One Swap at a Time</h1>
+        <p>At Vitaflow Medical, our innovative swappable ECMO kits revolutionize life-saving care for patients with heart or lung failure. Our modular systems reduce complications like blood clots and bleeding, ensuring safer, more efficient therapy.</p>
+        <h2>Why Choose Vitaflow?</h2>
+        <ul>
+            <li><strong>Swappable Design:</strong> Quick-change components minimize downtime, keeping ECMO therapy seamless.</li>
+            <li><strong>Enhanced Safety:</strong> Advanced coatings reduce blood cell damage (hemolysis) by up to 8%, based on recent research (Raman et al.).</li>
+            <li><strong>Clinician-Friendly:</strong> Easy-to-use kits streamline ICU operations, saving time and lives.</li>
+        </ul>
+        <h2>What Clinicians Say</h2>
+        <p>"Vitaflow’s kits cut circuit changes by half, improving patient outcomes." – Dr. Sarah Lin, ICU Specialist</p>
+        <p>"The modular design is a game-changer for managing ECMO in emergencies." – Dr. Michael Patel, Cardiologist</p>
+        <div class="product-slider">
+            <img src="assets/ecmo-kit.jpg" alt="Vitaflow ECMO Kit" />
+            <img src="assets/oxygenator.jpg" alt="Vitaflow Oxygenator" />
+            <img src="assets/tubing-set.jpg" alt="Vitaflow Tubing Set" />
+        </div>
+        <button onclick="window.location.href='#contact-us'">Request a Demo</button>
+    </section>
+
+    <!-- About Us -->
+    <section id="about-us">
+        <h1>About Vitaflow Medical</h1>
+        <h2>Our Mission</h2>
+        <p>Transforming ECMO therapy with modular, portable solutions that prioritize patient safety and clinical efficiency.</p>
+        <h2>Our Story</h2>
+        <p>Founded in 2020 by a team of biomedical engineers and clinicians, Vitaflow Medical was born from a vision to make ECMO safer and simpler. Inspired by challenges during the COVID-19 pandemic, where ECMO survival rates averaged 40–50% (Murakami et al. 515), we developed swappable kits to reduce complications like blood clots and bleeding.</p>
+        <h2>Meet Our Team</h2>
+        <p><strong>Dr. Emily Chen, CEO:</strong> A biomedical engineer with 15 years of experience in medical device innovation.</p>
+        <p><strong>Dr. Rajesh Kumar, Chief Medical Officer:</strong> A perfusionist dedicated to improving ECMO outcomes.</p>
+        <p><strong>Laura Evans, CTO:</strong> Leads development of hemocompatible coatings to minimize blood damage.</p>
+        <h2>Commitment to Safety</h2>
+        <p>Our kits align with ISO 10993-4 standards, reducing red blood cell damage (hemolysis) and platelet activation, ensuring safer therapy for critical patients.</p>
+        <div class="image-gallery">
+            <img src="assets/lab-development.jpg" alt="Vitaflow Lab Development" />
+            <img src="assets/clinical-use.jpg" alt="Vitaflow Kits in ICU" />
+        </div>
+        <a href="gallery.html">Explore Our Development Journey</a>
+    </section>
+
+    <!-- Products/Services -->
+    <section id="products-services">
+        <h1>Our Products and Services</h1>
+        <h2>Swappable ECMO Kits</h2>
+        <p>Vitaflow’s kits include a centrifugal pump, oxygenator, and tubing sets, designed for quick swaps to maintain therapy without interruption.</p>
+        <ul>
+            <li><strong>Centrifugal Pump:</strong> Delivers blood flow up to 7 L/min, minimizing shear stress that damages red blood cells.</li>
+            <li><strong>Oxygenator:</strong> Oxygenates blood with a priming volume of 150 mL, reducing blood trauma.</li>
+            <li><strong>Tubing Sets:</strong> Coated to lower clot formation by 5–8%, based on studies (Raman et al.).</li>
+        </ul>
+        <h2>Services</h2>
+        <p>We offer clinician training, maintenance support, and custom kit configurations to meet hospital needs.</p>
+        <div class="product-gallery">
+            <img src="assets/pump.jpg" alt="Centrifugal Pump" title="Flow Rate: 7 L/min" />
+            <img src="assets/oxygenator-unit.jpg" alt="Oxygenator" title="Priming Volume: 150 mL" />
+            <img src="assets/tubing.jpg" alt="Tubing Set" title="Coated for Hemocompatibility" />
+        </div>
+        <video src="assets/swap-demo.mp4" controls>Watch How to Swap Vitaflow Kits</video>
+        <button onclick="window.location.href='#contact-us'">Request a Quote</button>
+    </section>
+
+    <!-- Blog -->
+    <section id="blog">
+        <h1>Blog: Insights on ECMO Innovation</h1>
+        <article>
+            <h2>The Future of ECMO: How Swappable Kits Improve Outcomes</h2>
+            <p>Swappable ECMO kits reduce downtime, lowering risks of blood clots (thrombosis) by 5–8% and red blood cell damage (hemolysis) by up to 8% (Raman et al.). This means safer therapy and better survival rates, like the 40–50% seen in recent lung failure cases (Murakami et al. 515).</p>
+            <img src="assets/ecmo-setup.jpg" alt="Vitaflow ECMO in Action" />
+            <a href="blog1.html">Read More</a>
+        </article>
+        <article>
+            <h2>Streamlining ECMO in the ICU</h2>
+            <p>Clinicians report that Vitaflow’s kits cut setup time by 30%, allowing faster response in emergencies. Real-world feedback shows fewer bleeding complications with our coated tubing, aligning with studies on safer anticoagulants (Murakami et al. 516).</p>
+            <img src="assets/icu-use.jpg" alt="ECMO in ICU Setting" />
+            <a href="blog2.html">Read More</a>
+        </article>
+        <form action="subscribe.php" method="post">
+            <label for="email">Subscribe to Our Blog:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <button type="submit">Subscribe</button>
+        </form>
+        <div class="social-share">
+            <a href="https://twitter.com/share?url=vitaflow-blog">Share on X</a>
+            <a href="https://facebook.com/sharer.php?u=vitaflow-blog">Share on Facebook</a>
+        </div>
+    </section>
+
+    <!-- Contact Us -->
+    <section id="contact-us">
+        <h1>Contact Vitaflow Medical</h1>
+        <p>We’re here to answer your questions about our ECMO solutions. Reach out today!</p>
+        <ul>
+            <li><strong>Email:</strong> info@vitaflowmedical.com</li>
+            <li><strong>Phone:</strong> (800) 555-1234</li>
+            <li><strong>Address:</strong> 123 Innovation Drive, Medical City, TX 75001</li>
+        </ul>
+        <div class="map">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3350.432156831861!2d-96.79798508463547!3d33.09922908087166!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDA1JzU3LjIiTiA5NsKwNDcnNTIuNyJX!5e0!3m2!1sen!2sus!4v1697054321432" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+        <form action="https://formspree.io/f/your-form-id" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Your Name" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Your Email" required>
+            <label for="institution">Institution:</label>
+            <input type="text" id="institution" name="institution" placeholder="Your Hospital/Organization">
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" placeholder="Your Inquiry" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </section>
+
+    <script>
+        // Basic product slider functionality
+        const slider = document.querySelector('.product-slider');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+        });
+    </script>
+</body>
+</html>
